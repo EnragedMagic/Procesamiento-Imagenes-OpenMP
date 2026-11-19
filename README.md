@@ -27,12 +27,12 @@ Actualmente funciona:
 - Menú interactivo.
 - Generación automática de las tres versiones.
 - Guardado de imágenes procesadas en PNG.
-- Pruebas automáticas mediante Makefile.
+- Filtro paralelo RGB con OpenMP (opción 5, con 1, 2 o 4 hilos).
+- Pruebas del secuencial y de equivalencia mediante Makefile.
 
 Pendiente de integración:
 
-- Algoritmo paralelo con OpenMP.
-- Comparación secuencial y paralela.
+- Comparación secuencial y paralela desde la opción 6 del menú.
 - Mediciones de tiempo y memoria.
 - Cálculo de speedup y eficiencia.
 - Generación automática de gráficas SVG.
@@ -123,7 +123,7 @@ Aparecerá el menú principal:
 2. Seleccionar filtro.
 3. Ejecutar secuencial.
 4. Generar los tres filtros.
-5. Ejecutar paralelo (pendiente).
+5. Ejecutar paralelo y elegir 1, 2 o 4 hilos.
 6. Comparar algoritmos (pendiente).
 7. Experimentos y gráficas (pendiente).
 8. Salir.
@@ -201,7 +201,13 @@ Filtro 15x15: OK
 Resultado general: TODAS LAS PRUEBAS OK
 ```
 
-Estas pruebas verifican matemáticamente el filtro secuencial RGB.
+A continuación aparecen las líneas `OK` del test de equivalencia. Cada una comprueba todos los bytes RGB, los bordes y la entrada original para una combinación. Un error devuelve un código de salida distinto de cero.
+
+Para las 27 combinaciones de resoluciones grandes, filtros e hilos, ejecutar desde la raíz:
+
+```bash
+OMP_DYNAMIC=FALSE OMP_THREAD_LIMIT=4 ./test_paralelo --grandes
+```
 
 ## 11. Estructura del proyecto
 
@@ -213,12 +219,14 @@ procesamiento-imagenes-openmp/
 ├── src/
 │   ├── main.c
 │   ├── imagen.c
-│   └── filtro_secuencial.c
+│   ├── filtro_secuencial.c
+│   └── filtro_paralelo.c
 ├── imagenes/
 │   └── foto.jpg
 ├── resultados/
 ├── tests/
-│   └── test_rgb.c
+│   ├── test_rgb.c
+│   └── test_paralelo.c
 ├── docs/
 │   ├── DISENO_TECNICO.md
 │   └── DEPENDENCIAS.md
@@ -284,3 +292,17 @@ No deben utilizarse datos simulados como resultados definitivos.
 
 Los experimentos deberán comparar las mismas imágenes y tamaños de filtro en las versiones secuencial y paralela.
 ```
+
+## Integrante 3: experimentación reproducible
+
+El proyecto integra las dos versiones (`src/filtro_secuencial.c` y `src/filtro_paralelo.c`). Las opciones **6** y **7** del menú comparan tiempos de una foto seleccionada y ejecutan el conjunto experimental, respectivamente.
+
+```bash
+make test
+make benchmark
+python3 scripts/experimentar.py --resoluciones 256 512 1024 2048 --hilos 1 2 4 --filtros 3 7 15 --repeticiones 5
+```
+
+La opción 7 requiere Python 3; para obtener gráficas PNG instalar `python3-matplotlib` o `pip install matplotlib`. La prueba `benchmark` no requiere STB; el menú sí necesita `libstb-dev`.
+
+Los resultados reales se guardan en `resultados_experimentos/` (mediciones individuales, resumen por mediana, entorno y gráficas). **No son datos inventados**: deben ejecutarse y documentarse en el equipo final. Consulte `docs/METODOLOGIA_EXPERIMENTAL.md`.

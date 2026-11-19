@@ -131,4 +131,3 @@ La metodología detallada está en [docs/METODOLOGIA_EXPERIMENTAL.md](docs/METOD
 - **Johan Steven Galeano**
 - **Juan Vasquez**
 
-Repositorio original del proyecto: [linacastaneda/Procesamiento-Imagenes-openmp](https://github.com/linacastaneda/Procesamiento-Imagenes-openmp). El desarrollo integrado conserva la base secuencial y añade el procesamiento paralelo y las pruebas experimentales.
